@@ -19,7 +19,7 @@ def search_projects(request):
     response = requests.get(url, headers=headers)
     data = response.json()
 
-    return render(request, 'home.html', {
+    return render(request, 'core/home.html', {
         'repos': data.get('items', []),
         'query': query,
         'language': language,
