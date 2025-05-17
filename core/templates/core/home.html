@@ -50,6 +50,23 @@
     .pagination .page-link:hover {
       background-color: #333;
     }
+
+    /* Custom styles for dropdown submenu */
+    .dropdown-submenu {
+      position: relative;
+    }
+
+    .dropdown-submenu > .dropdown-menu {
+      top: 0;
+      left: 100%;
+      margin-left: 0.1rem;
+      margin-right: 0.1rem;
+    }
+
+    /* Show submenu on hover */
+    .dropdown-submenu:hover > .dropdown-menu {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -64,6 +81,8 @@
       <ul class="navbar-nav">
         <li class="nav-item"><a class="nav-link text-info" href="#">Explore</a></li>
         <li class="nav-item"><a class="nav-link text-info" href="#">Profile</a></li>
+
+       
         {% if not user.is_authenticated %}
         <li class="nav-item"><a class="nav-link text-info" href="{% url 'account_app:register' %}">Register</a></li>
         <li class="nav-item"><a class="nav-link text-info" href="{% url 'account_app:login' %}">Login</a></li>
@@ -77,28 +96,123 @@
 
 <div class="container">
   <h1 class="text-center text-info mb-4">// GitHub Open Source Search</h1>
+<form method="get" action="{% url 'core:search_projects' %}" id="searchForm">
+  <input type="hidden" name="language" id="languageInput" value="{{ request.GET.language|default:'' }}">
+  <input type="hidden" name="category" id="categoryInput" value="{{ request.GET.category|default:'' }}">
 
-  <form method="get" action="{% url 'core:search_projects' %}">
-    <div class="row mb-3">
-      <div class="col-md-8 mb-2">
-        <input type="text" name="q" class="form-control" placeholder="Search for 'AI', 'Django', etc." value="{{ request.GET.q }}">
-      </div>
-      <div class="col-md-4 mb-2">
-        <select name="language" class="form-select">
-          <option value="">All Languages</option>
-          <option value="JavaScript" {% if request.GET.language == "JavaScript" %}selected{% endif %}>JavaScript</option>
-          <option value="Python" {% if request.GET.language == "Python" %}selected{% endif %}>Python</option>
-          <option value="Java" {% if request.GET.language == "Java" %}selected{% endif %}>Java</option>
-          <option value="C++" {% if request.GET.language == "C++" %}selected{% endif %}>C++</option>
-          <option value="TypeScript" {% if request.GET.language == "TypeScript" %}selected{% endif %}>TypeScript</option>
-        </select>
+  <!-- Add clear selection buttons -->
+  <div class="row mb-3">
+    <div class="col-md-2">
+      <button type="button" id="clearLanguage" class="btn btn-outline-secondary w-100">Clear Language</button>
+    </div>
+    <div class="col-md-2">
+      <button type="button" id="clearCategory" class="btn btn-outline-secondary w-100">Clear Category</button>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-md-8 mb-2">
+      <input type="text" name="q" id="searchInput" class="form-control" placeholder="Search for 'AI', 'Django', etc." value="{{ request.GET.q }}">
+    </div>
+    <div class="col-md-2 mb-2">
+      <div class="dropdown">
+        <button class="btn btn-outline-info w-100 dropdown-toggle" type="button" id="languageDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+          {% if request.GET.language %}{{ request.GET.language }}{% else %}Languages{% endif %}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="languageDropdownBtn">
+          <li><button type="button" class="dropdown-item language-item" data-language="JavaScript">JavaScript</button></li>
+          <li><button type="button" class="dropdown-item language-item" data-language="Python">Python</button></li>
+          <li><button type="button" class="dropdown-item language-item" data-language="Java">Java</button></li>
+          <li><button type="button" class="dropdown-item language-item" data-language="C++">C++</button></li>
+          <li><button type="button" class="dropdown-item language-item" data-language="TypeScript">TypeScript</button></li>
+        </ul>
       </div>
     </div>
-
-    <div class="mb-4">
-      <button class="btn btn-dev w-100">Search()</button>
+    <div class="col-md-2 mb-2">
+      <div class="dropdown">
+        <button class="btn btn-outline-info w-100 dropdown-toggle" type="button" id="categoryDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+          {% if request.GET.category %}
+            {% if request.GET.category == 'website' %}Website{% elif request.GET.category == 'mobile' %}Mobile Application{% elif request.GET.category == 'ai_ml' %}AI/ML{% else %}Categories{% endif %}
+          {% else %}
+            Categories
+          {% endif %}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="categoryDropdownBtn">
+          <li><button type="button" class="dropdown-item category-item" data-category="website">Website</button></li>
+          <li><button type="button" class="dropdown-item category-item" data-category="mobile">Mobile Application</button></li>
+          <li><button type="button" class="dropdown-item category-item" data-category="ai_ml">AI/ML</button></li>
+        </ul>
+      </div>
     </div>
-  </form>
+  </div>
+
+  <div class="mb-4">
+    <button type="submit" class="btn btn-dev w-100">Search()</button>
+  </div>
+</form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const languageButtons = document.querySelectorAll('.language-item');
+    const categoryButtons = document.querySelectorAll('.category-item');
+    const languageInput = document.getElementById('languageInput');
+    const categoryInput = document.getElementById('categoryInput');
+    const languageDropdownBtn = document.getElementById('languageDropdownBtn');
+    const categoryDropdownBtn = document.getElementById('categoryDropdownBtn');
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+
+    languageButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const selectedLanguage = this.getAttribute('data-language');
+        languageInput.value = selectedLanguage;
+        languageDropdownBtn.textContent = selectedLanguage;
+      });
+    });
+
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const selectedCategory = this.getAttribute('data-category');
+        categoryInput.value = selectedCategory;
+        // Display user-friendly category name
+        let displayText = 'Categories';
+        if (selectedCategory === 'website') displayText = 'Website';
+        else if (selectedCategory === 'mobile') displayText = 'Mobile Application';
+        else if (selectedCategory === 'ai_ml') displayText = 'AI/ML';
+        categoryDropdownBtn.textContent = displayText;
+      });
+    });
+
+    // Clear selection buttons
+    const clearLanguageBtn = document.getElementById('clearLanguage');
+    const clearCategoryBtn = document.getElementById('clearCategory');
+
+    clearLanguageBtn.addEventListener('click', function() {
+      languageInput.value = '';
+      languageDropdownBtn.textContent = 'Languages';
+    });
+
+    clearCategoryBtn.addEventListener('click', function() {
+      categoryInput.value = '';
+      categoryDropdownBtn.textContent = 'Categories';
+    });
+
+    // Submit form only on Enter key in search input or Search button click
+    searchInput.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        searchForm.submit();
+      }
+    });
+
+    // Prevent form submission on dropdown button clicks
+    languageDropdownBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+    });
+    categoryDropdownBtn.addEventListener('click', function(event) {
+      event.preventDefault();
+    });
+  });
+</script>
 
   <div id="results">
     {% for repo in repos %}
