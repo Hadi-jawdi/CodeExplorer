@@ -215,7 +215,7 @@
 </script>
 
   <div id="results">
-    {% for repo in repos %}
+    {% for repo in page_obj %}
       <div class="repo-card" data-bs-toggle="modal" data-bs-target="#repoModal" onclick="showRepoModal(`{{ repo.full_name }}`, `{{ repo.description|default:'No description' }}`, `{{ repo.language }}`, `{{ repo.stargazers_count }}`, `{{ repo.forks_count }}`, `{{ repo.license.name|default:'No license' }}`, `{{ repo.html_url }}`)">
         <h5>{{ repo.full_name }}</h5>
         <p>{{ repo.description|default:"No description provided." }}</p>
@@ -225,6 +225,44 @@
       <p>No repositories found.</p>
     {% endfor %}
   </div>
+
+  {% if paginator.num_pages > 1 %}
+  <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ page_obj.previous_page_number }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-hidden="true">&laquo;</span>
+      </li>
+      {% endif %}
+
+      {% for num in paginator.page_range %}
+        {% if num == page_obj.number %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ page_obj.next_page_number }}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-hidden="true">&raquo;</span>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
 </div>
 
 <!-- Modal -->
