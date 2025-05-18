@@ -214,56 +214,71 @@
   });
 </script>
 
-  <div id="results">
-    {% for repo in page_obj %}
-      <div class="repo-card" data-bs-toggle="modal" data-bs-target="#repoModal" onclick="showRepoModal(`{{ repo.full_name }}`, `{{ repo.description|default:'No description' }}`, `{{ repo.language }}`, `{{ repo.stargazers_count }}`, `{{ repo.forks_count }}`, `{{ repo.license.name|default:'No license' }}`, `{{ repo.html_url }}`)">
-        <h5>{{ repo.full_name }}</h5>
-        <p>{{ repo.description|default:"No description provided." }}</p>
-        <span class="lang-badge">{{ repo.language }}</span> ⭐ {{ repo.stargazers_count }}
+<div id="results">
+  {% for repo in page_obj %}
+    <div class="repo-card p-3 mb-3 border rounded bg-dark text-white"
+         data-full-name="{{ repo.full_name|escapejs }}"
+         data-description="{{ repo.description|default:'No description'|escapejs }}"
+         data-language="{{ repo.language|default:'N/A'|escapejs }}"
+         data-stars="{{ repo.stargazers_count }}"
+         data-forks="{{ repo.forks_count }}"
+         data-license="{{ repo.license.name|default:'No license'|escapejs }}"
+         data-url="{{ repo.html_url|escapejs }}">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h5>{{ repo.full_name }}</h5>
+          <p>{{ repo.description|default:"No description provided." }}</p>
+          <span class="lang-badge badge bg-secondary">{{ repo.language }}</span>
+          ⭐ {{ repo.stargazers_count }}
+        </div>
+        <button class="btn btn-sm btn-outline-light"
+                onclick="event.stopPropagation(); event.preventDefault(); addToFavorites(`{{ repo.full_name|escapejs }}`, `{{ repo.html_url|escapejs }}`, `{{ repo.description|default:''|escapejs }}`, `{{ repo.language|default:''|escapejs }}`, `{{ repo.stargazers_count }}`)">
+          ❤️
+        </button>
       </div>
-    {% empty %}
-      <p>No repositories found.</p>
-    {% endfor %}
-  </div>
+    </div>
+  {% empty %}
+    <p class="text-white">No repositories found.</p>
+  {% endfor %}
+</div>
 
-  {% if paginator.num_pages > 1 %}
-  <nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-      {% if page_obj.has_previous %}
+{% if paginator.num_pages > 1 %}
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
       <li class="page-item">
         <a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ page_obj.previous_page_number }}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
         </a>
       </li>
-      {% else %}
+    {% else %}
       <li class="page-item disabled">
         <span class="page-link" aria-hidden="true">&laquo;</span>
       </li>
+    {% endif %}
+
+    {% for num in paginator.page_range %}
+      {% if num == page_obj.number %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% else %}
+        <li class="page-item"><a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ num }}">{{ num }}</a></li>
       {% endif %}
+    {% endfor %}
 
-      {% for num in paginator.page_range %}
-        {% if num == page_obj.number %}
-          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-        {% else %}
-          <li class="page-item"><a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ num }}">{{ num }}</a></li>
-        {% endif %}
-      {% endfor %}
-
-      {% if page_obj.has_next %}
+    {% if page_obj.has_next %}
       <li class="page-item">
         <a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ page_obj.next_page_number }}" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
         </a>
       </li>
-      {% else %}
+    {% else %}
       <li class="page-item disabled">
         <span class="page-link" aria-hidden="true">&raquo;</span>
       </li>
-      {% endif %}
-    </ul>
-  </nav>
-  {% endif %}
-</div>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
 
 <!-- Modal -->
 <div class="modal fade" id="repoModal" tabindex="-1" aria-hidden="true">
@@ -280,6 +295,51 @@
   </div>
 </div>
 
+<!-- JavaScript: Add to Favorites -->
+<script>
+  function addToFavorites(full_name, html_url, description, language, stars) {
+    fetch("{% url 'user_profile_app:add_favorite' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({
+        full_name,
+        html_url,
+        description,
+        language,
+        stars
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Added to favorites!');
+      } else {
+        alert('Failed to add to favorites: ' + data.error);
+      }
+    })
+    .catch(error => {
+      alert('Error adding to favorites: ' + error);
+    });
+  }
+
+  function showRepoModal(fullName, description, language, stars, forks, license, url) {
+    const modalBody = document.querySelector("#repoModal .modal-body");
+    modalBody.innerHTML = `
+      <h5>${fullName}</h5>
+      <p><strong>Description:</strong> ${description}</p>
+      <p><strong>Language:</strong> ${language}</p>
+      <p><strong>Stars:</strong> ${stars}</p>
+      <p><strong>Forks:</strong> ${forks}</p>
+      <p><strong>License:</strong> ${license}</p>
+      <p><a href="${url}" target="_blank" class="btn btn-sm btn-outline-light">View on GitHub</a></p>
+    `;
+  }
+</script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   function showRepoModal(name, desc, lang, stars, forks, license, url) {
@@ -294,7 +354,33 @@
       <a href="${url}" class="btn btn-outline-light btn-sm" target="_blank">View on GitHub</a>
     `;
   }
-</script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Existing DOMContentLoaded code here...
 
+  // Add event listeners to repo cards for modal opening
+  const repoCards = document.querySelectorAll('.repo-card');
+  repoCards.forEach(card => {
+    card.addEventListener('click', function(event) {
+      // If click target is favorite button or inside it, do nothing
+      if (event.target.closest('button.btn-outline-light')) {
+        return;
+      }
+      // Read data attributes
+      const fullName = card.getAttribute('data-full-name');
+      const description = card.getAttribute('data-description');
+      const language = card.getAttribute('data-language');
+      const stars = card.getAttribute('data-stars');
+      const forks = card.getAttribute('data-forks');
+      const license = card.getAttribute('data-license');
+      const url = card.getAttribute('data-url');
+
+      showRepoModal(fullName, description, language, stars, forks, license, url);
+      // Show the modal using Bootstrap's modal API
+      const repoModal = new bootstrap.Modal(document.getElementById('repoModal'));
+      repoModal.show();
+    });
+  });
+});
+</script>
 </body>
 </html>
