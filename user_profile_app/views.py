@@ -62,20 +62,34 @@ def profile_view(request):
     favorite_repos = FavoriteRepo.objects.filter(user=user)
     user_repos = []
     github_username = None
+    error_message = None
 
     # Ensure UserProfile exists
     profile, created = UserProfile.objects.get_or_create(user=user)
 
     if request.method == 'POST':
-        github_username = request.POST.get('github_username', '').strip()
-        if github_username:
-            profile.github_username = github_username
-            profile.save()
-
-    try:
-        github_username = profile.github_username
-    except Exception:
-        github_username = None
+        github_username_input = request.POST.get('github_username', '').strip()
+        if github_username_input:
+            # Validate GitHub username existence
+            url_user = f"https://api.github.com/users/{github_username_input}"
+            headers = {"Authorization": f"token {settings.GITHUB_TOKEN}"}
+            response_user = requests.get(url_user, headers=headers)
+            if response_user.status_code == 200:
+                profile.github_username = github_username_input
+                profile.save()
+                github_username = github_username_input
+                error_message = None
+            else:
+                github_username = None
+                error_message = "The entered username is not a valid GitHub username."
+        else:
+            github_username = None
+            error_message = None
+    else:
+        try:
+            github_username = profile.github_username
+        except Exception:
+            github_username = None
 
     if github_username:
         url = f"https://api.github.com/users/{github_username}/repos"
@@ -90,5 +104,7 @@ def profile_view(request):
         'username': user.username,
         'favorite_repos': favorite_repos,
         'user_repos': user_repos,
+        'github_username': github_username,
+        'error_message': error_message,
     }
     return render(request, 'user_profile_app/profile.html', context)

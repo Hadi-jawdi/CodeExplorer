@@ -60,13 +60,46 @@
           <div class="col-md-6">
             <div class="card card-custom p-4 shadow rounded-xl">
               <h5 class="text-info">Your GitHub Username</h5>
-              <form method="post" action="">
-                {% csrf_token %}
-                <div class="input-group mb-3">
-                  <input type="text" name="github_username" class="form-control" placeholder="Enter GitHub username" value="{{ user.profile.github_username|default_if_none:'' }}">
-                  <button class="btn btn-outline-info" type="submit">Save</button>
-                </div>
-              </form>
+              <div id="github-username-container">
+                {% if not github_username %}
+                <form method="post" action="" id="github-username-form">
+                  {% csrf_token %}
+                  <div class="input-group mb-3">
+                    <input type="text" name="github_username" class="form-control" placeholder="Enter GitHub username" value="">
+                    <button class="btn btn-outline-info" type="submit">Save</button>
+                  </div>
+                  {% if error_message %}
+                  <div class="text-danger mb-2">{{ error_message }}</div>
+                  {% endif %}
+                </form>
+                {% else %}
+                <p class="text-info">GitHub Username: <strong id="github-username-display">{{ github_username }}</strong>
+                  <button class="btn btn-sm btn-outline-info" id="edit-github-username-btn" type="button">Edit</button>
+                </p>
+                {% endif %}
+              </div>
+
+              <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  const editBtn = document.getElementById('edit-github-username-btn');
+                  const form = document.getElementById('github-username-form');
+                  const container = document.getElementById('github-username-container');
+                  if (editBtn) {
+                    editBtn.addEventListener('click', function() {
+                      // Show form and hide username display
+                      container.innerHTML = `
+                        <form method="post" action="" id="github-username-form">
+                          {% csrf_token %}
+                          <div class="input-group mb-3">
+                            <input type="text" name="github_username" class="form-control" placeholder="Enter GitHub username" value="{{ github_username }}">
+                            <button class="btn btn-outline-info" type="submit">Save</button>
+                          </div>
+                        </form>
+                      `;
+                    });
+                  }
+                });
+              </script>
               <h5 class="text-info mt-4">Your Projects</h5>
               <p class="text-sm text-slate-400">Track your recent open source contributions.</p>
               {% if user_repos %}
@@ -84,7 +117,11 @@
               {% else %}
               <p>No GitHub projects found. Please add your GitHub username in your profile.</p>
               {% endif %}
-              <button class="btn btn-outline-info btn-sm mt-2">View All</button>
+              {% if github_username %}
+              <a href="https://github.com/{{ github_username }}" target="_blank" class="btn btn-outline-info btn-sm mt-2">View Profile</a>
+              {% else %}
+              <button class="btn btn-outline-info btn-sm mt-2" disabled>View All</button>
+              {% endif %}
             </div>
           </div>
           <div class="col-md-6">
