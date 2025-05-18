@@ -44,3 +44,18 @@ def add_to_favorites(request):
 def delete_favorite(request, repo_id):
     FavoriteRepo.objects.filter(id=repo_id, user=request.user).delete()
     return redirect('user_dashboard')
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import FavoriteRepo
+
+@login_required
+def profile_view(request):
+    user = request.user
+    favorite_repos = FavoriteRepo.objects.filter(user=user)
+    context = {
+        'username': user.username,
+        'favorite_repos': favorite_repos,
+    }
+    return render(request, 'user_profile_app/profile.html', context)

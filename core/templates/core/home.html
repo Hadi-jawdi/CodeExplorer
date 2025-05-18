@@ -265,8 +265,16 @@
       </div>
     </div>
   {% empty %}
-    <p class="text-white">No repositories found.</p>
-  {% endfor %}
+    <p class="text-white">Please search on the search box like: Protfilio, Image downloader ....</p>
+    <p class="text-center text-white bg-dark p-3 rounded shadow-sm font-monospace" 
+    style="filter: blur(2px); opacity: 0.3; transition: all 0.3s ease;"
+    onmouseover="this.style.filter='none'; this.style.opacity='1';"
+    onmouseout="this.style.filter='blur(2px)'; this.style.opacity='0.3';">
+    Hadi Jawadi's product
+    </p>
+
+
+    {% endfor %}
 </div>
 
 {% if paginator.num_pages > 1 %}
