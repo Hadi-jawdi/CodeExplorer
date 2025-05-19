@@ -43,7 +43,7 @@ def add_to_favorites(request):
 @login_required
 def delete_favorite(request, repo_id):
     FavoriteRepo.objects.filter(id=repo_id, user=request.user).delete()
-    return redirect('user_dashboard')
+    return redirect('user_profile_app:profile')
 
 
 from django.contrib.auth.decorators import login_required
