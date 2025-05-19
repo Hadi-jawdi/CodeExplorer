@@ -7,4 +7,5 @@ urlpatterns = [
     path('account/', include('account_app.urls', namespace='account_app')),
     path('', include('core.urls', namespace='core')),
     path('user_profile/', include('user_profile_app.urls', namespace='user_profile_app')),
+    path('explore/', include('explore_app.urls', namespace='explore_app')),
 ]

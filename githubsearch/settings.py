@@ -30,8 +30,7 @@ INSTALLED_APPS = [
     'core',
     'account_app',
     'user_profile_app',
-    
-    
+    'explore_app',
 ]
 
 MIDDLEWARE = [
