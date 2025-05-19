@@ -1,6 +1,10 @@
 import requests
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from .models import FavoriteRepo
+import requests
 
 def explore(request):
     """
@@ -53,3 +57,30 @@ def explore(request):
         "category_filter": category_filter,
     }
     return render(request, "explore_app/explore.html", context)
+
+@login_required
+@require_POST
+def add_favorite(request):
+    """
+    View to add a repository to user's favorites.
+    """
+    user = request.user
+    repo_id = request.POST.get("repo_id")
+    repo_name = request.POST.get("repo_name")
+    repo_url = request.POST.get("repo_url")
+    repo_description = request.POST.get("repo_description", "")
+    repo_language = request.POST.get("repo_language", "")
+
+    if repo_id and repo_name and repo_url:
+        # Check if already favorited
+        favorite, created = FavoriteRepo.objects.get_or_create(
+            user=user,
+            repo_id=repo_id,
+            defaults={
+                "repo_name": repo_name,
+                "repo_url": repo_url,
+                "repo_description": repo_description,
+                "repo_language": repo_language,
+            }
+        )
+    return redirect("explore_app:explore")

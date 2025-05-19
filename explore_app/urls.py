@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import explore
+from . import views
 
 app_name = 'explore_app'
 
 urlpatterns = [
-    path('', explore, name='explore'),
+    path('', views.explore, name='explore'),
+    path('add_favorite/', views.add_favorite, name='add_favorite'),
 ]
