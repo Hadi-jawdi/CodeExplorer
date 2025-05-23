@@ -1,0 +1,77 @@
+{% load static %}
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 class="footer-title">
+                    <span class="code-bracket">&lt;</span>About Vcode<span class="code-bracket">/&gt;</span>
+                </h3>
+                <p class="footer-text">
+                    Your ultimate platform for discovering and exploring open-source projects. 
+                    Built by developers, for developers.
+                </p>
+                <div class="code-stats">
+                    <div class="stat-item">
+                        <span class="stat-icon">⚡</span>
+                        <span class="stat-value">1000+</span>
+                        <span class="stat-label">Projects</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">👨‍💻</span>
+                        <span class="stat-value">500+</span>
+                        <span class="stat-label">Developers</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3 class="footer-title">
+                    <span class="code-bracket">&lt;</span>Quick Links<span class="code-bracket">/&gt;</span>
+                </h3>
+                <ul class="footer-links">
+                    <li><a href="{% url 'core:home' %}"><span class="link-icon">⌂</span> Home</a></li>
+                    <li><a href="{% url 'explore_app:explore' %}"><span class="link-icon">⚡</span> Explore</a></li>
+                    <li><a href="{% url 'core:search_projects' %}"><span class="link-icon">🔍</span> Search</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3 class="footer-title">
+                    <span class="code-bracket">&lt;</span>Dev Tools<span class="code-bracket">/&gt;</span>
+                </h3>
+                <div class="dev-tools">
+                    <div class="tool-item">
+                        <span class="tool-icon">📊</span>
+                        <span class="tool-name">Code Analytics</span>
+                    </div>
+                    <div class="tool-item">
+                        <span class="tool-icon">🔧</span>
+                        <span class="tool-name">Project Builder</span>
+                    </div>
+                    <div class="tool-item">
+                        <span class="tool-icon">🤝</span>
+                        <span class="tool-name">Collaboration</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="copyright">
+                <span class="code-comment">// Copyright © {% now "Y" %} Vcode. All rights reserved.</span>
+            </div>
+            <div class="footer-tech">
+                <div class="tech-stack">
+                    <span class="tech-icon">⚛️</span>
+                    <span class="tech-name">React</span>
+                    <span class="tech-icon">🐍</span>
+                    <span class="tech-name">Python</span>
+                    <span class="tech-icon">💾</span>
+                    <span class="tech-name">Django</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<link rel="stylesheet" href="{% static 'css/footer.css' %}"> 

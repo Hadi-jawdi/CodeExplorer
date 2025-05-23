@@ -1,187 +1,379 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GitHub Open Source Search</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet"/>
-  <style>
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}GitHub Open Source Search - Vcode{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet"/>
+<style>
     body {
-      background-color: #0f1117;
-      color: #e0e0e0;
-      font-family: 'Fira Code', monospace;
-      padding: 2rem;
+        background-color: #0f1117;
+        color: #e0e0e0;
+        font-family: 'Fira Code', monospace;
+        padding: 2rem;
     }
     .form-control, .form-select {
-      background-color: #1a1d24;
-      color: white;
-      border: 1px solid #333;
+        background-color: #1a1d24;
+        color: white;
+        border: 1px solid #333;
     }
     .btn-dev {
-      background-color: #00ffc8;
-      border: none;
-      color: #000;
-      font-weight: bold;
+        background-color: #00ffc8;
+        border: none;
+        color: #000;
+        font-weight: bold;
     }
     .btn-dev:hover {
-      background-color: #00dab0;
+        background-color: #00dab0;
     }
     .repo-card {
-      background-color: #1f232a;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-left: 4px solid #00ffc8;
-      cursor: pointer;
+        background-color: #1f232a;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #00ffc8;
+        cursor: pointer;
     }
     .lang-badge {
-      font-size: 0.8rem;
-      padding: 0.2rem 0.5rem;
-      background-color: #292d36;
-      border-radius: 5px;
-      color: #ccc;
+        font-size: 0.8rem;
+        padding: 0.2rem 0.5rem;
+        background-color: #292d36;
+        border-radius: 5px;
+        color: #ccc;
     }
     .pagination .page-link {
-      background-color: #1a1d24;
-      color: white;
-      border: 1px solid #444;
+        background-color: #1a1d24;
+        color: white;
+        border: 1px solid #444;
     }
     .pagination .page-link:hover {
-      background-color: #333;
+        background-color: #333;
     }
 
     /* Custom styles for dropdown submenu */
     .dropdown-submenu {
-      position: relative;
+        position: relative;
     }
 
     .dropdown-submenu > .dropdown-menu {
-      top: 0;
-      left: 100%;
-      margin-left: 0.1rem;
-      margin-right: 0.1rem;
+        top: 0;
+        left: 100%;
+        margin-left: 0.1rem;
+        margin-right: 0.1rem;
     }
 
     /* Show submenu on hover */
     .dropdown-submenu:hover > .dropdown-menu {
-      display: block;
+        display: block;
     }
-  </style>
-  <style>
+
+    /* Custom Alert Styles */
+    .custom-alert {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 8px;
+        font-family: 'Fira Code', monospace;
+        font-weight: 500;
+        z-index: 1050;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        max-width: 350px;
+        cursor: pointer;
+    }
+
+    .custom-alert.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .custom-alert-success {
+        background-color: #00ffc8;
+        color: #000;
+        border-left: 4px solid #00dab0;
+    }
+
+    .custom-alert-warning {
+        background-color: #ffd700;
+        color: #000;
+        border-left: 4px solid #ffc107;
+    }
+
+    .custom-alert-danger {
+        background-color: #ff4444;
+        color: #fff;
+        border-left: 4px solid #cc0000;
+    }
+
+    .custom-alert .alert-icon {
+        margin-right: 10px;
+        font-size: 1.2em;
+    }
+
+    .custom-alert .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: inherit;
+        opacity: 0.7;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        z-index: 1051;
+    }
+
+    .custom-alert .close-btn:hover {
+        opacity: 1;
+    }
+
+    .custom-alert .alert-link {
+        color: #000;
+        text-decoration: underline;
+        font-weight: bold;
+        margin-left: 5px;
+        transition: all 0.2s ease;
+    }
+
+    .custom-alert .alert-link:hover {
+        color: #0066cc;
+        text-decoration: none;
+    }
+
+    .custom-alert:hover {
+        transform: translateX(0) scale(1.02);
+    }
+
+    .custom-alert .alert-content {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+<style>
     /* Notification box styles */
     #notificationBox {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #00ffc8;
-      color: #000;
-      padding: 15px 25px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 255, 200, 0.4);
-      font-family: 'Fira Code', monospace;
-      font-weight: bold;
-      z-index: 1055;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease-in-out;
-      min-width: 250px;
-      text-align: center;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #00ffc8;
+        color: #000;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 255, 200, 0.4);
+        font-family: 'Fira Code', monospace;
+        font-weight: bold;
+        z-index: 1055;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease-in-out;
+        min-width: 250px;
+        text-align: center;
     }
     #notificationBox.show {
-      opacity: 1;
-      pointer-events: auto;
+        opacity: 1;
+        pointer-events: auto;
     }
-  </style>
-</head>
-<body>
 
+    /* Signature styles */
+    .signature-container {
+        text-align: center;
+        margin-top: 1rem;
+        transition: opacity 0.3s ease;
+    }
+
+    .signature-text {
+        font-family: 'Fira Code', monospace;
+        color: #666;
+        font-size: 0.9rem;
+        opacity: 0.3;
+        transition: all 0.3s ease;
+        text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        cursor: default;
+        display: inline-block;
+    }
+
+    .signature-text:hover {
+        opacity: 1;
+        color: #00ffc8;
+        text-shadow: 0 0 15px rgba(0, 255, 200, 0.3);
+    }
+
+    .signature-text.hidden {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
 <div id="notificationBox"></div>
 
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-4 rounded">
-  <div class="container">
-    <a class="navbar-brand" href="#">Vcode</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link text-info" href="#">Explore</a></li>
-
-       
-        {% if not user.is_authenticated %}
-
-        <li class="nav-item"><a class="nav-link text-info" href="{% url 'account_app:register' %}">Register</a></li>
-        <li class="nav-item"><a class="nav-link text-info" href="{% url 'account_app:login' %}">Login</a></li>
-
-        {% else %}
-        <li class="nav-item"><a class="nav-link text-info" href="{% url 'user_profile_app:profile' %}">Profile</a></li>
-
-        <li class="nav-item"><a class="nav-link text-info" href="{% url 'account_app:logout' %}">Logout</a></li>
-        {% endif %}
-      </ul>
-    </div>
-  </div>
-</nav>
-
 <div class="container">
-  <h1 class="text-center text-info mb-4">// GitHub Open Source Search</h1>
-<form method="get" action="{% url 'core:search_projects' %}" id="searchForm">
-  <input type="hidden" name="language" id="languageInput" value="{{ request.GET.language|default:'' }}">
-  <input type="hidden" name="category" id="categoryInput" value="{{ request.GET.category|default:'' }}">
+    <h1 class="text-center text-info mb-4">// GitHub Open Source Search</h1>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="custom-alert custom-alert-{{ message.tags }} show" role="alert">
+            <div class="alert-content">
+                <span class="alert-icon">
+                    {% if message.tags == 'success' %}✨{% elif message.tags == 'warning' %}⚠️{% else %}❌{% endif %}
+                </span>
+                {{ message|safe }}
+            </div>
+            <button type="button" class="close-btn" onclick="event.stopPropagation(); this.parentElement.classList.remove('show')">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if error_message %}
+    <div class="alert alert-danger" role="alert">
+        {{ error_message }}
+    </div>
+    {% endif %}
+    
+    <form method="get" action="{% url 'core:search_projects' %}" id="searchForm">
+        <input type="hidden" name="language" id="languageInput" value="{{ request.GET.language|default:'' }}">
+        <input type="hidden" name="category" id="categoryInput" value="{{ request.GET.category|default:'' }}">
 
-  <!-- Add clear selection buttons -->
-  <div class="row mb-3">
-    <div class="col-md-2">
-      <button type="button" id="clearLanguage" class="btn btn-outline-secondary w-100">Clear Language</button>
+        <!-- Add clear selection buttons -->
+        <div class="row mb-3">
+            <div class="col-md-2">
+                <button type="button" id="clearLanguage" class="btn btn-outline-secondary w-100">Clear Language</button>
+            </div>
+            <div class="col-md-2">
+                <button type="button" id="clearCategory" class="btn btn-outline-secondary w-100">Clear Category</button>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-8 mb-2">
+                <input type="text" name="q" id="searchInput" class="form-control" placeholder="Search for 'AI', 'Django', etc." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-2 mb-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-info w-100 dropdown-toggle" type="button" id="languageDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if request.GET.language %}{{ request.GET.language }}{% else %}Languages{% endif %}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="languageDropdownBtn">
+                        <li><button type="button" class="dropdown-item language-item" data-language="JavaScript">JavaScript</button></li>
+                        <li><button type="button" class="dropdown-item language-item" data-language="Python">Python</button></li>
+                        <li><button type="button" class="dropdown-item language-item" data-language="Java">Java</button></li>
+                        <li><button type="button" class="dropdown-item language-item" data-language="C++">C++</button></li>
+                        <li><button type="button" class="dropdown-item language-item" data-language="TypeScript">TypeScript</button></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-2 mb-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-info w-100 dropdown-toggle" type="button" id="categoryDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if request.GET.category %}
+                            {% if request.GET.category == 'website' %}Website{% elif request.GET.category == 'mobile' %}Mobile Application{% elif request.GET.category == 'ai_ml' %}AI/ML{% else %}Categories{% endif %}
+                        {% else %}
+                            Categories
+                        {% endif %}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="categoryDropdownBtn">
+                        <li><button type="button" class="dropdown-item category-item" data-category="website">Website</button></li>
+                        <li><button type="button" class="dropdown-item category-item" data-category="mobile">Mobile Application</button></li>
+                        <li><button type="button" class="dropdown-item category-item" data-category="ai_ml">AI/ML</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <button type="submit" class="btn btn-dev w-100">Search()</button>
+            </div>
+        </div>
+    </form>
+    
+    {% if repos %}
+    <div class="row">
+        {% for repo in repos %}
+        <div class="col-md-6 mb-4">
+            <div class="repo-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="text-info mb-0">{{ repo.name }}</h5>
+                    <div>
+                        <a href="{{ repo.html_url }}" target="_blank" class="btn btn-sm btn-outline-info me-2">View Repo</a>
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'core:add_to_favorites' %}" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="repo_name" value="{{ repo.name }}">
+                            <input type="hidden" name="repo_url" value="{{ repo.html_url }}">
+                            <input type="hidden" name="description" value="{{ repo.description }}">
+                            <input type="hidden" name="language" value="{{ repo.language }}">
+                            <input type="hidden" name="stars" value="{{ repo.stargazers_count }}">
+                            <button type="submit" class="btn btn-sm btn-outline-warning">⭐ Add to Favorites</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="description-box mb-3">
+                    <p class="text-muted mb-1"><small>Description:</small></p>
+                    <p class="text-light">{{ repo.description|truncatechars:200 }}</p>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="lang-badge me-2">{{ repo.language }}</span>
+                        <span class="text-muted">👁️ {{ repo.watchers_count }}</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="text-warning me-2">⭐ {{ repo.stargazers_count }}</span>
+                        <span class="text-muted">📅 {{ repo.updated_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                {% if repo.topics %}
+                <div class="mt-2">
+                    {% for topic in repo.topics|slice:":3" %}
+                    <span class="badge bg-secondary me-1">{{ topic }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    <div class="col-md-2">
-      <button type="button" id="clearCategory" class="btn btn-outline-secondary w-100">Clear Category</button>
-    </div>
-  </div>
-  <div class="row mb-3">
-    <div class="col-md-8 mb-2">
-      <input type="text" name="q" id="searchInput" class="form-control" placeholder="Search for 'AI', 'Django', etc." value="{{ request.GET.q }}">
-    </div>
-    <div class="col-md-2 mb-2">
-      <div class="dropdown">
-        <button class="btn btn-outline-info w-100 dropdown-toggle" type="button" id="languageDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
-          {% if request.GET.language %}{{ request.GET.language }}{% else %}Languages{% endif %}
-        </button>
-        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="languageDropdownBtn">
-          <li><button type="button" class="dropdown-item language-item" data-language="JavaScript">JavaScript</button></li>
-          <li><button type="button" class="dropdown-item language-item" data-language="Python">Python</button></li>
-          <li><button type="button" class="dropdown-item language-item" data-language="Java">Java</button></li>
-          <li><button type="button" class="dropdown-item language-item" data-language="C++">C++</button></li>
-          <li><button type="button" class="dropdown-item language-item" data-language="TypeScript">TypeScript</button></li>
+    
+    {% if paginator.num_pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?q={{ query }}&language={{ language }}&page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for num in paginator.page_range %}
+            <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                <a class="page-link" href="?q={{ query }}&language={{ language }}&page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?q={{ query }}&language={{ language }}&page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
         </ul>
-      </div>
+    </nav>
+    {% endif %}
+    {% endif %}
+    
+    <div class="signature-container" id="signatureContainer">
+        <div class="signature-text">Hadi Jawadi's product</div>
     </div>
-    <div class="col-md-2 mb-2">
-      <div class="dropdown">
-        <button class="btn btn-outline-info w-100 dropdown-toggle" type="button" id="categoryDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
-          {% if request.GET.category %}
-            {% if request.GET.category == 'website' %}Website{% elif request.GET.category == 'mobile' %}Mobile Application{% elif request.GET.category == 'ai_ml' %}AI/ML{% else %}Categories{% endif %}
-          {% else %}
-            Categories
-          {% endif %}
-        </button>
-        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="categoryDropdownBtn">
-          <li><button type="button" class="dropdown-item category-item" data-category="website">Website</button></li>
-          <li><button type="button" class="dropdown-item category-item" data-category="mobile">Mobile Application</button></li>
-          <li><button type="button" class="dropdown-item category-item" data-category="ai_ml">AI/ML</button></li>
-        </ul>
-      </div>
-    </div>
-  </div>
+</div>
+{% endblock %}
 
-  <div class="mb-4">
-    <button type="submit" class="btn btn-dev w-100">Search()</button>
-  </div>
-</form>
-
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     const languageButtons = document.querySelectorAll('.language-item');
     const categoryButtons = document.querySelectorAll('.category-item');
     const languageInput = document.getElementById('languageInput');
@@ -191,25 +383,37 @@
     const searchForm = document.getElementById('searchForm');
     const searchInput = document.getElementById('searchInput');
 
+    // Initialize category from URL if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
+    if (categoryParam) {
+        categoryInput.value = categoryParam;
+        let displayText = 'Categories';
+        if (categoryParam === 'website') displayText = 'Website';
+        else if (categoryParam === 'mobile') displayText = 'Mobile Application';
+        else if (categoryParam === 'ai_ml') displayText = 'AI/ML';
+        categoryDropdownBtn.textContent = displayText;
+    }
+
     languageButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const selectedLanguage = this.getAttribute('data-language');
-        languageInput.value = selectedLanguage;
-        languageDropdownBtn.textContent = selectedLanguage;
-      });
+        button.addEventListener('click', function() {
+            const selectedLanguage = this.getAttribute('data-language');
+            languageInput.value = selectedLanguage;
+            languageDropdownBtn.textContent = selectedLanguage;
+        });
     });
 
     categoryButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const selectedCategory = this.getAttribute('data-category');
-        categoryInput.value = selectedCategory;
-        // Display user-friendly category name
-        let displayText = 'Categories';
-        if (selectedCategory === 'website') displayText = 'Website';
-        else if (selectedCategory === 'mobile') displayText = 'Mobile Application';
-        else if (selectedCategory === 'ai_ml') displayText = 'AI/ML';
-        categoryDropdownBtn.textContent = displayText;
-      });
+        button.addEventListener('click', function() {
+            const selectedCategory = this.getAttribute('data-category');
+            categoryInput.value = selectedCategory;
+            // Display user-friendly category name
+            let displayText = 'Categories';
+            if (selectedCategory === 'website') displayText = 'Website';
+            else if (selectedCategory === 'mobile') displayText = 'Mobile Application';
+            else if (selectedCategory === 'ai_ml') displayText = 'AI/ML';
+            categoryDropdownBtn.textContent = displayText;
+        });
     });
 
     // Clear selection buttons
@@ -217,241 +421,72 @@
     const clearCategoryBtn = document.getElementById('clearCategory');
 
     clearLanguageBtn.addEventListener('click', function() {
-      languageInput.value = '';
-      languageDropdownBtn.textContent = 'Languages';
+        languageInput.value = '';
+        languageDropdownBtn.textContent = 'Languages';
     });
 
     clearCategoryBtn.addEventListener('click', function() {
-      categoryInput.value = '';
-      categoryDropdownBtn.textContent = 'Categories';
+        categoryInput.value = '';
+        categoryDropdownBtn.textContent = 'Categories';
     });
 
     // Submit form only on Enter key in search input or Search button click
     searchInput.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        searchForm.submit();
-      }
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            searchForm.submit();
+        }
     });
 
     // Prevent form submission on dropdown button clicks
     languageDropdownBtn.addEventListener('click', function(event) {
-      event.preventDefault();
+        event.preventDefault();
     });
     categoryDropdownBtn.addEventListener('click', function(event) {
-      event.preventDefault();
+        event.preventDefault();
     });
-  });
-</script>
 
-<div id="results">
-  {% for repo in page_obj %}
-    <div class="repo-card p-3 mb-3 border rounded bg-dark text-white"
-         data-full-name="{{ repo.full_name|escapejs }}"
-         data-description="{{ repo.description|default:'No description'|escapejs }}"
-         data-language="{{ repo.language|default:'N/A'|escapejs }}"
-         data-stars="{{ repo.stargazers_count }}"
-         data-forks="{{ repo.forks_count }}"
-         data-license="{{ repo.license.name|default:'No license'|escapejs }}"
-         data-url="{{ repo.html_url|escapejs }}">
-      <div class="d-flex justify-content-between align-items-start">
-        <div>
-          <h5>{{ repo.full_name }}</h5>
-          <p>{{ repo.description|default:"No description provided." }}</p>
-          <span class="lang-badge badge bg-secondary">{{ repo.language }}</span>
-          ⭐ {{ repo.stargazers_count }}
-        </div>
-        <button class="btn btn-sm btn-outline-light"
-                onclick="event.stopPropagation(); event.preventDefault(); addToFavorites(`{{ repo.full_name|escapejs }}`, `{{ repo.html_url|escapejs }}`, `{{ repo.description|default:''|escapejs }}`, `{{ repo.language|default:''|escapejs }}`, `{{ repo.stargazers_count }}`)">
-          ❤️
-        </button>
-      </div>
-    </div>
-  {% empty %}
-    <p class="text-white">Please search on the search box like: Protfilio, Image downloader ....</p>
-    <p class="text-center text-white bg-dark p-3 rounded shadow-sm font-monospace" 
-    style="filter: blur(2px); opacity: 0.3; transition: all 0.3s ease;"
-    onmouseover="this.style.filter='none'; this.style.opacity='1';"
-    onmouseout="this.style.filter='blur(2px)'; this.style.opacity='0.3';">
-    Hadi Jawadi's product
-    </p>
+    // Handle signature visibility based on search results
+    const signatureContainer = document.getElementById('signatureContainer');
+    
+    searchForm.addEventListener('submit', function() {
+        signatureContainer.classList.add('hidden');
+    });
 
+    // Show signature when search results are cleared
+    const clearButtons = document.querySelectorAll('#clearLanguage, #clearCategory');
+    clearButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            if (!document.querySelector('.repo-card')) {
+                signatureContainer.classList.remove('hidden');
+            }
+        });
+    });
 
-    {% endfor %}
-</div>
-
-{% if paginator.num_pages > 1 %}
-<nav aria-label="Page navigation example">
-  <ul class="pagination justify-content-center">
-    {% if page_obj.has_previous %}
-      <li class="page-item">
-        <a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ page_obj.previous_page_number }}" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-    {% else %}
-      <li class="page-item disabled">
-        <span class="page-link" aria-hidden="true">&laquo;</span>
-      </li>
-    {% endif %}
-
-    {% for num in paginator.page_range %}
-      {% if num == page_obj.number %}
-        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-      {% else %}
-        <li class="page-item"><a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ num }}">{{ num }}</a></li>
-      {% endif %}
-    {% endfor %}
-
-    {% if page_obj.has_next %}
-      <li class="page-item">
-        <a class="page-link" href="?q={{ query }}{% if language %}&language={{ language }}{% endif %}&page={{ page_obj.next_page_number }}" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-    {% else %}
-      <li class="page-item disabled">
-        <span class="page-link" aria-hidden="true">&raquo;</span>
-      </li>
-    {% endif %}
-  </ul>
-</nav>
-{% endif %}
-
-<!-- Modal -->
-<div class="modal fade" id="repoModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content text-light" style="background-color: #1f232a;">
-      <div class="modal-header border-0">
-        <h5 class="modal-title">Repository Details</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <!-- Populated dynamically -->
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- JavaScript: Add to Favorites -->
-<script>
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
+    // Show signature when page loads if no search results
+    if (!document.querySelector('.repo-card')) {
+        signatureContainer.classList.remove('hidden');
     }
-    return cookieValue;
-  }
 
-  function addToFavorites(full_name, html_url, description, language, stars) {
-    const csrftoken = getCookie('csrftoken');
-    fetch("{% url 'user_profile_app:add_favorite' %}", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrftoken
-      },
-      body: JSON.stringify({
-        full_name,
-        html_url,
-        description,
-        language,
-        stars
-      }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Add to favorites response:', data);
-      if (data.success) {
-        showNotification(`'${full_name}' has been added to your favorites!`);
-      } else {
-        showNotification('Failed to add to favorites: ' + data.error, true);
-      }
-    })
-    .catch(error => {
-      console.error('Error adding to favorites:', error);
-      showNotification('Error adding to favorites: ' + error, true);
+    // Handle alert clicks
+    const alerts = document.querySelectorAll('.custom-alert');
+    alerts.forEach(alert => {
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            alert.classList.remove('show');
+        }, 5000);
+
+        // Handle click on alert
+        alert.addEventListener('click', function(e) {
+            // Don't trigger if clicking the close button
+            if (!e.target.classList.contains('close-btn')) {
+                const link = this.querySelector('.alert-link');
+                if (link) {
+                    window.location.href = link.href;
+                }
+            }
+        });
     });
-  }
-
-  function showNotification(message, isError = false) {
-    const notificationBox = document.getElementById('notificationBox');
-    notificationBox.textContent = message;
-    notificationBox.style.backgroundColor = isError ? '#ff4c4c' : '#00ffc8';
-    notificationBox.style.color = isError ? '#fff' : '#000';
-    notificationBox.classList.add('show');
-    setTimeout(() => {
-      notificationBox.classList.remove('show');
-    }, 4000);
-  }
-
-  function showRepoModal(fullName, description, language, stars, forks, license, url) {
-    const modalBody = document.querySelector("#repoModal .modal-body");
-    modalBody.innerHTML = `
-      <h5>${fullName}</h5>
-      <p><strong>Description:</strong> ${description}</p>
-      <p><strong>Language:</strong> ${language}</p>
-      <p><strong>Stars:</strong> ${stars}</p>
-      <p><strong>Forks:</strong> ${forks}</p>
-      <p><strong>License:</strong> ${license}</p>
-      <div class="d-flex gap-2">
-        <a href="${url}" target="_blank" class="btn btn-sm btn-outline-light">View on GitHub</a>
-        <button id="modalFavoriteBtn" class="btn btn-sm btn-outline-light">Add to Favorite ❤️</button>
-      </div>
-    `;
-
-    // Re-attach event listener for modal favorite button after content update
-    const modalFavoriteBtn = document.getElementById('modalFavoriteBtn');
-    if (modalFavoriteBtn) {
-      modalFavoriteBtn.addEventListener('click', function() {
-        addToFavorites(fullName, url, description, language, stars);
-      });
-    }
-  }
-</script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Existing DOMContentLoaded code here...
-
-  let currentModalRepo = null;
-
-  // Add event listeners to repo cards for modal opening
-  const repoCards = document.querySelectorAll('.repo-card');
-  repoCards.forEach(card => {
-    card.addEventListener('click', function(event) {
-      // If click target is favorite button or inside it, do nothing
-      if (event.target.closest('button.btn-outline-light')) {
-        return;
-      }
-      // Read data attributes
-      const fullName = card.getAttribute('data-full-name');
-      const description = card.getAttribute('data-description');
-      const language = card.getAttribute('data-language');
-      const stars = card.getAttribute('data-stars');
-      const forks = card.getAttribute('data-forks');
-      const license = card.getAttribute('data-license');
-      const url = card.getAttribute('data-url');
-
-      currentModalRepo = { fullName, description, language, stars, forks, license, url };
-
-      showRepoModal(fullName, description, language, stars, forks, license, url);
-      // Show the modal using Bootstrap's modal API
-      const repoModal = new bootstrap.Modal(document.getElementById('repoModal'));
-      repoModal.show();
-    });
-  });
 });
 </script>
-</body>
-</html>
+{% endblock %}

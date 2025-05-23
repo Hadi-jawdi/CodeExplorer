@@ -1,0 +1,23 @@
+{% load static %}
+<header class="main-header">
+    <nav class="navbar">
+        <div class="container">
+            <a href="{% url 'core:home' %}" class="logo">
+                <span class="logo-bracket">&lt;</span>Vcode<span class="logo-bracket">/&gt;</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="{% url 'core:home' %}" class="nav-link"><span class="nav-icon">⌂</span> Home</a></li>
+                <li><a href="{% url 'explore_app:explore' %}" class="nav-link"><span class="nav-icon">⚡</span> Explore</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'user_profile_app:profile' %}" class="nav-link"><span class="nav-icon">👤</span> Profile</a></li>
+                    <li><a href="{% url 'account_app:logout' %}" class="nav-link"><span class="nav-icon">↪</span> Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'account_app:login' %}" class="nav-link"><span class="nav-icon">🔑</span> Login</a></li>
+                    <li><a href="{% url 'account_app:register' %}" class="nav-link"><span class="nav-icon">✎</span> Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<link rel="stylesheet" href="{% static 'css/header.css' %}"> 

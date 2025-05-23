@@ -17,6 +17,28 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 import json
 
+from django.contrib import messages
+import requests
+from django.conf import settings
+
+@login_required
+def update_profile(request):
+    if request.method == 'POST':
+        profile = request.user.profile
+        bio = request.POST.get('bio', '').strip()
+        profile_photo = request.FILES.get('profile_photo')
+        
+        if bio:
+            profile.bio = bio
+        if profile_photo:
+            profile.profile_photo = profile_photo
+            
+        profile.save()
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('user_profile_app:profile')
+    
+    return redirect('user_profile_app:profile')
+
 def add_to_favorites(request):
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'error': 'Authentication required'}, status=401)
@@ -106,5 +128,6 @@ def profile_view(request):
         'user_repos': user_repos,
         'github_username': github_username,
         'error_message': error_message,
+        'profile': profile,
     }
     return render(request, 'user_profile_app/profile.html', context)
