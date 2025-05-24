@@ -5,426 +5,165 @@
 
 {% block extra_css %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="{% static 'css/profile.css' %}">
 <style>
     :root {
-        --gradient-primary: linear-gradient(135deg, #61DAFB 0%, #4DABF7 100%);
-        --gradient-secondary: linear-gradient(135deg, #4DABF7 0%, #339AF0 100%);
-        --gradient-accent: linear-gradient(135deg, #FFD43B 0%, #FAB005 100%);
-        --code-bg: rgba(40, 44, 52, 0.95);
-        --code-border: #3E4451;
-        --code-text: #ABB2BF;
-        --code-keyword: #C678DD;
-        --code-string: #98C379;
-        --code-comment: #5C6370;
-        --code-function: #61AFEF;
-        --code-variable: #E06C75;
-        --code-number: #D19A66;
-        --code-operator: #56B6C2;
+        --bg-dark: #1e1e1e;
+        --bg-card: #252526;
+        --border-color: #333333;
+        --text-primary: #d4d4d4;
+        --text-secondary: #858585;
+        --accent: #569cd6;
+        --comment: #6a9955;
     }
 
     body {
-        background-color: var(--background-dark) !important;
-        color: var(--text-primary) !important;
-        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-primary);
+        font-family: 'JetBrains Mono', monospace;
         line-height: 1.6;
     }
 
     .profile-container {
-        min-height: 100vh;
-        background: linear-gradient(to bottom right, rgba(97, 218, 251, 0.05), rgba(77, 171, 247, 0.05));
-        padding: 1rem;
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
     }
 
     .profile-header {
-        margin-bottom: 0;
+        margin-bottom: 2rem;
         padding: 1rem;
-        background: var(--code-bg);
-        border-radius: 0.5rem 0.5rem 0 0;
-        border: 1px solid var(--code-border);
-        position: relative;
-        font-family: 'JetBrains Mono', monospace;
-    }
-
-    .profile-header::before {
-        content: '// User Profile';
-        position: absolute;
-        right: 20px;
-        top: 10px;
-        font-size: 0.8rem;
-        color: var(--code-comment);
+        border-bottom: 1px solid var(--border-color);
     }
 
     .profile-header h1 {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         margin: 0;
-        color: var(--code-text);
+        color: var(--text-primary);
     }
 
-    .text-gradient {
-        color: var(--code-function);
+    .text-accent {
+        color: var(--accent);
     }
 
-    .profile-card {
-        background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        border-radius: 0 0 0.5rem 0.5rem;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease-in-out;
-        position: relative;
-        font-family: 'JetBrains Mono', monospace;
+    .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
         margin-bottom: 1rem;
-        margin-top: 0;
     }
 
-    .profile-card:hover {
-        transform: translateY(-2px);
-        border-color: var(--code-function);
+    .card-header {
+        background: var(--bg-dark);
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.75rem 1rem;
     }
 
-    .card-header-custom {
-        padding: 1rem;
-        border-bottom: 1px solid var(--code-border);
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 0.5rem 0.5rem 0 0;
-        position: relative;
-    }
-
-    .card-header-custom h5 {
-        font-family: 'JetBrains Mono', monospace;
+    .card-header h5 {
         margin: 0;
-        color: var(--code-function);
+        color: var(--accent);
+        font-size: 1rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 1rem;
     }
 
-    .card-header-custom h5::before {
-        content: 'function';
-        color: var(--code-comment);
-        font-size: 0.8rem;
-        margin-right: 0.5rem;
-    }
-
-    .profile-photo-container {
-        width: 150px;
-        height: 150px;
-        border-radius: 0.5rem;
-        overflow: hidden;
-        margin: 0 auto 1rem;
-        border: 2px solid var(--code-border);
-        position: relative;
-    }
-
-    .profile-photo-container::after {
-        content: '// Profile Image';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(0, 0, 0, 0.7);
-        color: var(--code-comment);
-        font-size: 0.8rem;
-        padding: 0.25rem;
-        text-align: center;
+    .card-body {
+        padding: 1rem;
     }
 
     .profile-photo {
-        width: 100%;
-        height: 100%;
+        width: 120px;
+        height: 120px;
+        border-radius: 4px;
         object-fit: cover;
+        border: 2px solid var(--border-color);
     }
 
-    .profile-photo-placeholder {
-        width: 100%;
-        height: 100%;
-        background: var(--code-bg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--code-comment);
-        font-size: 3.5rem;
-    }
-
-    .bio-text {
-        color: var(--code-text);
-        font-family: 'JetBrains Mono', monospace;
-        margin-top: 0.5rem;
+    .repo-card {
+        background: var(--bg-dark);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
         padding: 0.75rem;
-        background: var(--code-bg);
-        border-radius: 0.5rem;
-        border: 1px solid var(--code-border);
-        position: relative;
-        font-size: 0.9rem;
-        line-height: 1.6;
-    }
-
-    .bio-text::before {
-        content: '// Bio';
-        position: absolute;
-        left: 10px;
-        top: -10px;
-        font-size: 0.8rem;
-        color: var(--code-comment);
-        background: var(--code-bg);
-        padding: 0 0.5rem;
-    }
-
-    .project-card {
-        background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        border-radius: 0.5rem;
-        padding: 1rem;
         margin-bottom: 0.75rem;
-        transition: all 0.3s ease-in-out;
-        position: relative;
     }
 
-    .project-card:hover {
-        background: rgba(0, 0, 0, 0.3);
-        border-color: var(--code-function);
-        transform: translateX(5px);
-    }
-
-    .project-title {
-        color: var(--code-function);
+    .repo-title {
+        color: var(--accent);
         text-decoration: none;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 1rem;
+        font-size: 0.9rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
-    .project-title::before {
-        content: 'class';
-        color: var(--code-comment);
-        font-size: 0.8rem;
-    }
-
-    .project-description {
-        color: var(--code-text);
-        font-size: 0.9rem;
-        margin-top: 0.5rem;
-        padding-left: 1rem;
-        border-left: 2px solid var(--code-border);
+    .repo-description {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        margin: 0.5rem 0;
     }
 
     .language-badge {
-        background: var(--code-bg);
-        color: var(--code-string);
-        padding: 0.25rem 0.75rem;
-        border-radius: 0.25rem;
-        font-size: 0.875rem;
-        border: 1px solid var(--code-border);
-        font-family: 'JetBrains Mono', monospace;
+        background: var(--bg-card);
+        color: var(--text-secondary);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        border: 1px solid var(--border-color);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
     }
 
     .btn {
         font-family: 'JetBrains Mono', monospace;
         padding: 0.4rem 0.75rem;
-        border-radius: 0.25rem;
-        transition: all 0.3s ease-in-out;
-        position: relative;
-        background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        color: var(--code-text);
+        border-radius: 4px;
         font-size: 0.9rem;
+        background: var(--bg-dark);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
     }
 
     .btn:hover {
-        background: var(--code-bg);
-        border-color: var(--code-function);
-        color: var(--code-function);
+        border-color: var(--accent);
+        color: var(--accent);
     }
 
     .btn-primary {
-        background: var(--code-bg);
-        border: 1px solid var(--code-function);
-        color: var(--code-function);
+        background: var(--bg-dark);
+        border: 1px solid var(--accent);
+        color: var(--accent);
     }
 
     .btn-primary:hover {
-        background: var(--code-function);
-        color: var(--code-bg);
+        background: var(--accent);
+        color: var(--bg-dark);
+    }
+
+    .form-control {
+        background: var(--bg-dark);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .form-control:focus {
+        background: var(--bg-dark);
+        border-color: var(--accent);
+        color: var(--text-primary);
+        box-shadow: none;
     }
 
     .empty-state {
         text-align: center;
-        padding: 3rem 1rem;
-        position: relative;
-        color: var(--code-comment);
-        font-family: 'JetBrains Mono', monospace;
+        padding: 2rem;
+        color: var(--text-secondary);
     }
 
-    .empty-state::before {
-        content: '// Empty State';
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        font-size: 0.8rem;
-        color: var(--code-comment);
-    }
-
-    .repo-card {
-        background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 0.75rem;
-        transition: all 0.3s ease-in-out;
-        font-family: 'JetBrains Mono', monospace;
-    }
-
-    .repo-card:hover {
-        background: rgba(0, 0, 0, 0.3);
-        border-color: var(--code-function);
-        transform: translateX(5px);
-    }
-
-    .repo-title {
-        color: var(--code-function);
-        font-size: 1rem;
-        margin: 0;
-    }
-
-    .description-box {
-        background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        border-radius: 0.5rem;
-        padding: 0.75rem;
-        margin: 0.5rem 0;
-        position: relative;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.9rem;
-    }
-
-    .description-box::before {
-        content: '// Description';
-        position: absolute;
-        left: 10px;
-        top: -10px;
-        font-size: 0.8rem;
-        color: var(--code-comment);
-        background: var(--code-bg);
-        padding: 0 0.5rem;
-    }
-
-    .description-box p {
-        margin: 0;
-        color: var(--code-text);
-    }
-
-    .description-box .text-muted {
-        color: var(--code-comment) !important;
-        font-size: 0.8rem;
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: var(--code-bg);
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: var(--code-border);
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: var(--code-function);
-    }
-
-    /* Code-like form elements */
-    .form-control {
-        background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        color: var(--code-text);
-        border-radius: 0.25rem;
-        padding: 0.5rem 0.75rem;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.9rem;
-    }
-
-    .form-control:focus {
-        background: var(--code-bg);
-        border-color: var(--code-function);
-        box-shadow: none;
-        color: var(--code-text);
-    }
-
-    .input-group-text {
-        background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        color: var(--code-comment);
-        border-radius: 0.25rem;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.9rem;
-        padding: 0.5rem 0.75rem;
-    }
-
-    /* Alert styling */
-    .alert {
-        background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        color: var(--code-text);
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.9rem;
-        padding: 0.75rem;
-        border-radius: 0.5rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .alert-danger {
-        border-color: var(--code-variable);
-        color: var(--code-variable);
-    }
-
-    /* GitHub username form */
-    .github-profile-info {
-        padding: 0.75rem;
-        background: var(--code-bg);
-        border: 1px solid var(--code-border);
-        border-radius: 0.5rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .github-profile-info p {
-        margin: 0;
-        color: var(--code-text);
-    }
-
-    .github-profile-info strong {
-        color: var(--code-string);
-    }
-
-    /* Section spacing */
-    .section-spacing {
-        margin-bottom: 1rem;
-    }
-
-    /* Code-like dividers */
-    .code-divider {
-        height: 1px;
-        background: var(--code-border);
-        margin: 1rem 0;
-        position: relative;
-    }
-
-    .code-divider::before {
-        content: '//';
-        position: absolute;
-        left: 0;
-        top: -10px;
-        color: var(--code-comment);
-        font-size: 0.8rem;
+    .text-muted {
+        color: var(--text-secondary) !important;
     }
 </style>
 {% endblock %}
@@ -436,161 +175,166 @@
 
 {% block content %}
 <div class="profile-container">
-    <div class="container">
-        <div class="profile-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h1>// Welcome, <span class="text-gradient">{{ username }}</span></h1>
-            </div>
-        </div>
+    <div class="profile-header">
+        <h1>// <span class="text-accent">{{ username }}</span></h1>
+    </div>
 
-        <!-- Profile Photo and Bio Section -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="profile-card">
-                    <div class="card-header-custom">
-                        <h5><i class="bi bi-person-circle"></i> profile_info</h5>
-                    </div>
-                    <div class="p-4 text-center">
-                        <div class="profile-photo-container">
-                            {% if profile.profile_photo %}
-                                <img src="{{ profile.profile_photo.url }}" alt="Profile Photo" class="profile-photo">
-                            {% else %}
-                                <div class="profile-photo-placeholder">
-                                    <i class="bi bi-person"></i>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="bio-section">
-                            {% if profile.bio %}
-                                <p class="bio-text">// {{ profile.bio }}</p>
-                            {% else %}
-                                <p class="bio-placeholder">// No bio added yet.</p>
-                            {% endif %}
-                        </div>
-                    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+          
+
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-github"></i> github</h5>
                 </div>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="profile-card">
-                    <div class="card-header-custom">
-                        <h5><i class="bi bi-github"></i> github_profile</h5>
-                    </div>
-                    <div id="github-username-container" class="p-3">
-                        {% if not github_username %}
-                        <form method="post" action="" id="github-username-form" class="profile-form">
-                            {% csrf_token %}
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">const username =</span>
-                                <input type="text" name="github_username" class="form-control" placeholder="'your_username'" value="">
-                                <button class="btn btn-primary" type="submit">save()</button>
+                <div class="card-body">
+                    {% if not github_username %}
+                        {% if not is_github_connected %}
+                            <div class="text-center mb-3">
+                                <p class="text-muted mb-3">Connect your GitHub account to automatically sync your profile</p>
+                                <a href="{% url 'social:begin' 'github' %}" class="btn btn-primary mb-3">
+                                    <i class="bi bi-github"></i> Connect with GitHub
+                                </a>
+                                <p class="text-muted small">Or enter your GitHub username manually:</p>
                             </div>
-                            {% if error_message %}
-                            <div class="alert alert-danger">console.error('{{ error_message }}')</div>
-                            {% endif %}
-                        </form>
+                            <form method="post" action="" class="mb-3">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input type="text" name="github_username" class="form-control" placeholder="GitHub username">
+                                    <button class="btn btn-primary" type="submit">Save</button>
+                                </div>
+                            </form>
                         {% else %}
-                        <div class="github-profile-info">
-                            <p class="text-info">
-                                <i class="bi bi-github"></i> const username = <strong id="github-username-display">'{{ github_username }}'</strong>
-                            </p>
-                        </div>
+                            <div class="text-center">
+                                <p class="text-muted">Loading GitHub profile...</p>
+                            </div>
                         {% endif %}
-                    </div>
-
-                    <div class="card-header-custom mt-4">
-                        <h5><i class="bi bi-code-slash"></i> projects</h5>
-                    </div>
-                    <div class="p-3">
-                        <p class="text-muted">// Track your recent open source contributions</p>
-                        {% if user_repos %}
-                        <div class="projects-list">
-                            {% for repo in user_repos %}
-                            <div class="project-card">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <a href="{{ repo.html_url }}" class="project-title" target="_blank">
-                                            <i class="bi bi-git"></i> {{ repo.name }}
-                                        </a>
-                                        {% if repo.description %}
-                                        <p class="project-description">// {{ repo.description }}</p>
-                                        {% endif %}
+                    {% else %}
+                        {% if github_profile_data %}
+                            <div class="text-center mb-3">
+                                <img src="{{ github_profile_data.avatar_url }}" alt="GitHub Profile" class="profile-photo mb-2">
+                                <h6 class="mb-1">{{ github_profile_data.name|default:github_username }}</h6>
+                                {% if github_profile_data.bio %}
+                                    <p class="text-muted small mb-2">{{ github_profile_data.bio }}</p>
+                                {% endif %}
+                                <div class="d-flex justify-content-center gap-3 mb-3">
+                                    <div class="text-center">
+                                        <div class="fw-bold">{{ github_profile_data.public_repos }}</div>
+                                        <div class="small text-muted">Repos</div>
                                     </div>
-                                    <span class="language-badge">{{ repo.language|default:"N/A" }}</span>
+                                    <div class="text-center">
+                                        <div class="fw-bold">{{ github_profile_data.followers }}</div>
+                                        <div class="small text-muted">Followers</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="fw-bold">{{ github_profile_data.following }}</div>
+                                        <div class="small text-muted">Following</div>
+                                    </div>
                                 </div>
                             </div>
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        <div class="empty-state">
-                            <i class="bi bi-github empty-icon"></i>
-                            <p>// No GitHub projects found. Add your GitHub username to see your projects.</p>
-                        </div>
                         {% endif %}
-                        {% if github_username %}
-                        <a href="https://github.com/{{ github_username }}" target="_blank" class="btn btn-primary w-100 mt-3">
-                            <i class="bi bi-github"></i> viewProfile()
+                        <a href="https://github.com/{{ github_username }}" target="_blank" class="btn btn-primary w-100">
+                            <i class="bi bi-github"></i> View Profile
                         </a>
+                        {% if not is_github_connected %}
+                            <div class="text-center mt-3">
+                                <a href="{% url 'social:begin' 'github' %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-link-45deg"></i> Connect GitHub Account
+                                </a>
+                            </div>
                         {% endif %}
-                    </div>
+                    {% endif %}
                 </div>
             </div>
+        </div>
 
-            <div class="col-md-6">
-                <div class="profile-card">
-                    <div class="card-header-custom d-flex justify-content-between align-items-center">
-                        <h5><i class="bi bi-bookmark-star"></i> favorites</h5>
-                        <a href="{% url 'core:home' %}" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-plus-lg"></i> addNew()
-                        </a>
-                    </div>
-                    <div class="favorite-repos p-3">
-                        {% for repo in favorite_repos %}
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="bi bi-star"></i> favorites</h5>
+                    <a href="{% url 'core:home' %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus"></i> Add
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% for repo in favorite_repos %}
                         <div class="repo-card">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="repo-title">
-                                    <i class="bi bi-git"></i> {{ repo.repo_name }}
-                                </h6>
-                                <form method="post" action="{% url 'user_profile_app:delete_favorite' repo.id %}" style="margin:0;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <a href="{{ repo.repo_url }}" class="repo-title" target="_blank">
+                                        {{ repo.repo_name }}
+                                    </a>
+                                    {% if repo.description %}
+                                        <div class="repo-description">{{ repo.description|truncatechars:150 }}</div>
+                                    {% endif %}
+                                </div>
+                                <form method="post" action="{% url 'user_profile_app:delete_favorite' repo.id %}" class="ms-2">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Remove from favorites">
-                                        <i class="bi bi-trash"></i> remove()
+                                    <button type="submit" class="btn btn-sm" title="Remove">
+                                        <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
                             </div>
-                            {% if repo.description %}
-                            <div class="description-box">
-                                <p class="text-muted mb-1">// Description:</p>
-                                <p>{{ repo.description|truncatechars:150 }}</p>
-                            </div>
+                            {% if repo.language %}
+                                <span class="language-badge">{{ repo.language }}</span>
                             {% endif %}
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    {% if repo.language %}
-                                    <span class="language-badge">
-                                        {{ repo.language }}
-                                    </span>
-                                    {% endif %}
-                                </div>
-                                <a href="{{ repo.repo_url }}" target="_blank" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-box-arrow-up-right"></i> viewRepo()
-                                </a>
-                            </div>
                         </div>
-                        {% empty %}
-                        <div class="empty-state text-center py-8">
-                            <i class="bi bi-bookmark-star empty-icon"></i>
-                            <p>// No favorite repositories yet.</p>
-                            <a href="{% url 'core:home' %}" class="btn btn-primary mt-4">
-                                <i class="bi bi-search"></i> searchRepos()
+                    {% empty %}
+                        <div class="empty-state">
+                            <p>No favorite repositories yet.</p>
+                            <a href="{% url 'core:home' %}" class="btn btn-primary">
+                                Search Repositories
                             </a>
                         </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if github_username and user_repos %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="bi bi-code-square"></i> repositories</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for repo in user_repos %}
+                            <div class="repo-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <a href="{{ repo.html_url }}" class="repo-title" target="_blank">
+                                            <i class="bi bi-git"></i> {{ repo.name }}
+                                        </a>
+                                        {% if repo.description %}
+                                            <div class="repo-description">{{ repo.description|truncatechars:150 }}</div>
+                                        {% endif %}
+                                        <div class="d-flex gap-3 mt-2">
+                                            {% if repo.language %}
+                                                <span class="language-badge">
+                                                    <i class="bi bi-circle-fill" style="color: {% if repo.language == 'Python' %}#3572A5{% elif repo.language == 'JavaScript' %}#f1e05a{% elif repo.language == 'TypeScript' %}#2b7489{% elif repo.language == 'Java' %}#b07219{% elif repo.language == 'C++' %}#f34b7d{% else %}#8256d0{% endif %}"></i>
+                                                    {{ repo.language }}
+                                                </span>
+                                            {% endif %}
+                                            {% if repo.stargazers_count > 0 %}
+                                                <span class="language-badge">
+                                                    <i class="bi bi-star-fill"></i> {{ repo.stargazers_count }}
+                                                </span>
+                                            {% endif %}
+                                            {% if repo.forks_count > 0 %}
+                                                <span class="language-badge">
+                                                    <i class="bi bi-diagram-2"></i> {{ repo.forks_count }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-primary add-favorite" 
+                                            data-repo='{"full_name": "{{ repo.full_name }}", "html_url": "{{ repo.html_url }}", "description": "{{ repo.description|default:''|escapejs }}", "language": "{{ repo.language|default:'' }}", "stars": {{ repo.stargazers_count }}}'>
+                                        <i class="bi bi-star"></i>
+                                    </button>
+                                </div>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>

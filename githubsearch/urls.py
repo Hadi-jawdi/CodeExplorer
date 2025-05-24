@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include('core.urls', namespace='core')),
     path('user_profile/', include('user_profile_app.urls', namespace='user_profile_app')),
     path('explore/', include('explore_app.urls', namespace='explore_app')),
+    path('social-auth/', include('social_django.urls', namespace='social')),
 ]
 
 if settings.DEBUG:

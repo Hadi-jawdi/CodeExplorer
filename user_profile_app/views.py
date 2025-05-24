@@ -84,12 +84,23 @@ def profile_view(request):
     favorite_repos = FavoriteRepo.objects.filter(user=user)
     user_repos = []
     github_username = None
+    github_profile_data = None
     error_message = None
 
     # Ensure UserProfile exists
     profile, created = UserProfile.objects.get_or_create(user=user)
 
-    if request.method == 'POST':
+    # Check if user logged in with GitHub
+    social_auth = user.social_auth.filter(provider='github').first()
+    
+    if social_auth:
+        # User logged in with GitHub, get their username
+        github_username = social_auth.extra_data.get('login')
+        if github_username:
+            profile.github_username = github_username
+            profile.save()
+    elif request.method == 'POST':
+        # Manual GitHub username entry
         github_username_input = request.POST.get('github_username', '').strip()
         if github_username_input:
             # Validate GitHub username existence
@@ -100,6 +111,7 @@ def profile_view(request):
                 profile.github_username = github_username_input
                 profile.save()
                 github_username = github_username_input
+                github_profile_data = response_user.json()
                 error_message = None
             else:
                 github_username = None
@@ -108,26 +120,38 @@ def profile_view(request):
             github_username = None
             error_message = None
     else:
+        # Try to get existing GitHub username from profile
         try:
             github_username = profile.github_username
         except Exception:
             github_username = None
 
+    # Fetch GitHub profile data if we have a username
     if github_username:
-        url = f"https://api.github.com/users/{github_username}/repos"
+        url_user = f"https://api.github.com/users/{github_username}"
         headers = {"Authorization": f"token {settings.GITHUB_TOKEN}"}
-        response = requests.get(url, headers=headers)
-        if response.status_code == 200:
-            user_repos = response.json()
-        else:
-            user_repos = []
+        response_user = requests.get(url_user, headers=headers)
+        if response_user.status_code == 200:
+            github_profile_data = response_user.json()
+            
+            # Fetch repositories
+            url = f"https://api.github.com/users/{github_username}/repos"
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                user_repos = response.json()
+                # Sort repos by stars and last updated
+                user_repos.sort(key=lambda x: (x.get('stargazers_count', 0), x.get('updated_at', '')), reverse=True)
+            else:
+                user_repos = []
 
     context = {
         'username': user.username,
         'favorite_repos': favorite_repos,
         'user_repos': user_repos,
         'github_username': github_username,
+        'github_profile_data': github_profile_data,
         'error_message': error_message,
         'profile': profile,
+        'is_github_connected': bool(social_auth),
     }
     return render(request, 'user_profile_app/profile.html', context)
