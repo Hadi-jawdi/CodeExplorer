@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import FavoriteRepo
 import requests
 
@@ -36,7 +37,7 @@ def explore(request):
         "q": full_query,
         "sort": "stars",
         "order": "desc",
-        "per_page": 9
+        "per_page": 100  # Fetch more results to allow for pagination
     }
     headers = {}
     token = getattr(settings, "GITHUB_TOKEN", None)
@@ -51,8 +52,19 @@ def explore(request):
         # fallback empty list or handle error as needed
         repos = []
 
+    # Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(repos, 6)  # Show 6 repos per page
+    
+    try:
+        page_obj = paginator.page(page)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
     context = {
-        "repositories": repos,
+        "page_obj": page_obj,
         "language_filter": language_filter,
         "category_filter": category_filter,
     }

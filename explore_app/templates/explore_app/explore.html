@@ -8,6 +8,37 @@
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="{% static 'css/explore.css' %}">
+<style>
+    .pagination {
+        margin-top: 2rem;
+        justify-content: center;
+    }
+
+    .pagination .page-link {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        margin: 0 0.2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(45deg, #00ff9d, #00b8ff);
+        border-color: transparent;
+        color: #1a1a1a;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background: rgba(255, 255, 255, 0.02);
+        color: rgba(255, 255, 255, 0.3);
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -64,7 +95,7 @@
 
     <!-- Repositories Grid -->
     <div class="repo-grid">
-        {% for repo in repositories %}
+        {% for repo in page_obj %}
         <div class="repo-card">
             <div class="repo-header">
                 <h5 class="repo-title">{{ repo.name }}</h5>
@@ -103,6 +134,65 @@
         </div>
         {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Repository pagination">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if category_filter %}&category={{ category_filter }}{% endif %}{% if language_filter %}&language={{ language_filter }}{% endif %}" aria-label="First">
+                        <i class="bi bi-chevron-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if language_filter %}&language={{ language_filter }}{% endif %}" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-double-left"></i></span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if language_filter %}&language={{ language_filter }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if language_filter %}&language={{ language_filter }}{% endif %}" aria-label="Next">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if language_filter %}&language={{ language_filter }}{% endif %}" aria-label="Last">
+                        <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-double-right"></i></span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 
 <script>
