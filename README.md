@@ -1,6 +1,6 @@
-# VCode - A Comprehensive Developer Platform
+# CodeExplorer  - A Comprehensive Developer Platform
 
-Code Explorer is a feature-rich web application built with Django that provides a platform for developers to explore, connect, and showcase their work. The platform includes user profiles, GitHub integration, and various social features.
+CodeExplorer is a feature-rich web application built with Django that provides a platform for developers to explore, connect, and showcase their work. The platform includes user profiles, GitHub integration, and various social features.
 
 ## 🚀 Features
 
