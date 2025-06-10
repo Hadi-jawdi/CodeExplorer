@@ -1,6 +1,6 @@
 # VCode - A Comprehensive Developer Platform
 
-VCode is a feature-rich web application built with Django that provides a platform for developers to explore, connect, and showcase their work. The platform includes user profiles, GitHub integration, and various social features.
+Code Explorer is a feature-rich web application built with Django that provides a platform for developers to explore, connect, and showcase their work. The platform includes user profiles, GitHub integration, and various social features.
 
 ## 🚀 Features
 
